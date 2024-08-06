@@ -1,21 +1,26 @@
-`mongodb_demo`: demo of using atlas mongo db. 
+# Poetry + MongoDB Project
+
+This project includes a comprehensive use of Poetry and MongoDB, accompanied by detailed notes in `MongoDB-Poetry Notes.md`. It covers an extensive range of key functionalities and usage of both technologies, from introductory concepts to advanced techniques.
+
+## Installation
+
+Refer to the `MongoDB-Poetry Notes.md` file for prerequisites, installation, and startup instructions.
+
+## Project Structure
+
+**`mongodb_demo`:** Demonstrates the use of Atlas MongoDB, including:
 
 - Connection
 - CRUD operations
-- Aggreagate, Query and Update operators
+- Aggregate, query, and update operators
 
+**`stock_info_parser`:** Retrieves stock information via the Alpha Vantage API and a GitHub repository.
 
+- `data` and `githubdata`: Retrieved data
 
-`stock_info_parser`: get stock infomation via alpha vantage api and github repositry.
+**`poetry`:** Contains a `poetry notes.txt` file detailing the use of a virtual environment for Python projects.
 
-- `data` and `githubdata` are data retrieved
-
-
-
-`poetry`: includes a poetry notes.txt outlined how to use virtual environment for python project. 
-
-- Poetry Notes.txt
-- poetry.lock
-- poetry.toml
-
-- `.venv`: virtual environment created in project
+- `Poetry Notes.txt`
+- `poetry.lock`
+- `poetry.toml`
+- `.venv`: Virtual environment created in the project
