@@ -1,4 +1,163 @@
-# Get Started
+# Poetry
+
+## 1. Installation
+
+- Installer Script macOS
+
+  - ```
+    curl -sSL https://install.python-poetry.org | python3 -
+    ```
+
+- Use Vim / Nano to add Poetry bin directory is in your `PATH`
+
+  - Open File
+
+    ```
+    nano ~/.zshrc
+    ```
+
+  - Add Path
+
+    ```
+    export PATH="$HOME/.local/bin:$PATH"
+    ```
+
+  - Apply Changes
+
+    ```
+    source ~/.zshrc
+    ```
+
+  - Check Installation
+
+    ```
+    poetry --version
+    ```
+
+
+
+## 2. Usage
+
+### 2.1 Start a poetry project
+
+```
+poetry init
+```
+
+Guides you through creating a new `pyproject.toml` file for managing your project's dependencies and settings.
+
+
+
+### 2.2 Configuring Virtual Environments
+
+```
+poetry config virtualenvs.in-project true
+```
+
+Sets the location for virtual environments to be within the project's directory. 
+
+- Beneficial for managing environments on a per-project basis
+
+
+
+### 2.3 Install
+
+```
+poetry install
+```
+
+Install all dependencies specified in `pyproject.toml`.
+
+
+
+### 2.3 Running the Program
+
+#### 2.3.1 Poetry Shell
+
+```
+poetry shell		# start shell
+exit						# stop shell
+```
+
+- Opens a new shell with the virtual environment activated.
+- Any command run after this will be within the context of the virtual environment.
+
+#### 2.3.2 Poetry Run Command
+
+```
+poetry run python <FILE_NAME.py>
+```
+
+- Directly runs a specific command within the virtual environment without keeping the environment activated afterward.
+
+
+
+### 2.4 Add Packages
+
+```
+poetry add <package_name>
+```
+
+- It can be useful to specify version constraints when adding a package
+
+  - ```
+    poetry add requests@^2.25
+    ```
+
+
+
+### 2.5 Remove Packages
+
+```
+poetry remove <package_name>
+```
+
+When removing a package (`poetry remove`), Poetry will also remove its dependencies, but only if they are not required by any other package in the project. If a dependency is needed by another package, it remains installed.
+
+
+
+### 2.6 Extra Useful Commands
+
+```
+poetry update
+```
+
+Updates the packages to their latest versions within the constraints 
+
+```
+poetry lock
+```
+
+Regenerates the lock file (`poetry.lock`) for ensuring consistent installs across multiple environments or setups.
+
+- `poetry.lock`: records exact versions of all dependencies used in a Poetry-managed Python project.
+- `pyproject.toml`: is where dependencies are initially declared with possibly flexible version
+
+```
+poetry show
+```
+
+Lists installed packages and their dependencies for auditing / understanding project's dependency tree.
+
+## 3. .toml vs .lock
+
+**Purpose:**
+
+- `pyproject.toml` is for declaring which dependencies you want to use.
+- `poetry.lock` is for recording the exact versions of dependencies that were actually installed.
+
+**Role in Dependency Management:**
+
+- `pyproject.toml` helps in defining and managing the project dependencies at a high level.
+- `poetry.lock` ensures consistency and repeatability by locking in specific versions.
+
+Think of `pyproject.toml` as your shopping list for dependencies, where you specify what you need, and `poetry.lock` as the receipt that records what exactly was purchased and in what versions
+
+
+
+# MongoDB
+
+## 1. Get Started
 
 Install Homebrew
 
@@ -40,7 +199,7 @@ client = MongoClient(uri)
 
 
 
-# Creating a Database
+## 2. Creating a Database
 
 - In MongoDB, a database is not actually created until it gets content.
 ```bash
@@ -64,25 +223,25 @@ db = client['<DB Name>']
 
 
 
-# Creating Collections 
+## 3. Creating Collections 
 
 - In MongoDB, a collection is not actually created until it gets content.
 - Collection: Grouping of MongoDB Documents, like a Table in Relational DB
 
-## Explicit Way
+### 3.1 Explicit Way
 
 ```javascript
 db.createCollection(<CollectionName>)
 e.g db.createCollection("people")
 ```
 
-## Implicit Way
+### 3.2 Implicit Way
 ```javascript
 db.<CollectionName>.insertOne(<Object>)
 db.people.insertOne({"name": "Eve"})
 ```
 
-- Python
+### 3.3 Python
 
 ```python
 # MongoDB will create the collection when you first insert a document into it
@@ -91,15 +250,11 @@ collection = db['<COLLECTION NAME>']
 
 
 
-# ##################
-
-
-
-# Inserting Documents
+## 4. Inserting Documents
 
 - Document: An object or like an entry of a Table in Relational DB
 
-## Insert a Single Document
+### 4.1 Insert a Single Document
 ```javascript
 db.<Collectionname>.insertOne(<Object>)
 
@@ -113,7 +268,7 @@ db.people.insertOne({
 })
 ```
 
-## Insert Multiple Documents
+### 4.2 Insert Multiple Documents
 ```javascript
 db.<CollectionName>.insertMany(<ObjectLists>)
 
@@ -145,27 +300,27 @@ db.people.insertMany([
 
 
 
-# Finding Data
+## 5. Finding Data
 
-## Find Multiple Documents
+### 5.1 Find Multiple Documents
 ```javascript
 db.people.find(<{...}>)
 ```
 - This method accepts a query object. If left empty, all documents will be returned.
 
-## Find One Document
+### 5.2 Find One Document
 ```javascript
 db.people.findOne(<{...}>)
 ```
 - This method accepts a query object. If left empty, it will return the first document it finds.
 
-## Querying Data
+### 5.3 Querying Data
 - To query or filter data, include a query in the `find()` or `findOne()` methods.
 ```javascript
 db.people.find({gender: "female"})
 ```
 
-## Projection
+### 5.4 Projection
 - A second parameter for both `find` methods.
 - This parameter is an object that describes which fields/keys to include in the results.
   - `field/key: 1` indicates that the field should be included in the result.
@@ -177,18 +332,18 @@ db.people.find({}, { name: 1, gender: 1, _id: 0 });
 
 
 
-# Updating Data
+## 6. Updating Data
 
 - `query`: 1st Partameter, Object to define which documents should be updated.
 - `update`: 2nd Parameter, Object defining the updated data.
 - `$set:`
 
-## Update One Document
+### 6.1 Update One Document
 
 ```javascript
 db.people.updateOne(query, $set: update)
 ```
-## Update Multiple Documents
+### 6.2 Update Multiple Documents
 ```javascript
 db.people.updateMany(query, $set: update)
 ```
@@ -197,7 +352,9 @@ e.g:
 db.people.updateOne({name:"Bob"}, {$set: {height: "180cm"}})
 ```
 
-## Insert if not found
+
+
+### 6.3 Insert if not found
 
 If you would like to insert the document if it is not found, you can use the `upsert` option.
 
@@ -216,13 +373,13 @@ db.people.updateOne(
 )
 ```
 
-# Delete Documents
+## 7. Delete Documents
 
 We can delete documents by using the methods `deleteOne()` or `deleteMany()`.
 
 These methods accept a query object. The matching documents will be deleted.
 
-## Delete One Document
+### 7.1 Delete One Document
 
  `deleteOne()`: method will delete the first document that matches the query provided.
 
@@ -230,7 +387,7 @@ These methods accept a query object. The matching documents will be deleted.
 db.people.deleteOne({ name: "Charlie" })
 ```
 
-## Delete Many Documents
+### 7.2 Delete Many Documents
 
 `deleteMany()`: method will delete all documents that match the query provided.
 
@@ -240,13 +397,9 @@ db.people.deleteMany({ gender: "male" })
 
 
 
-# ##################
+## 8. Query Operators
 
-
-
-# Query Operators
-
-## Comparison
+### 8.1 Comparison
 
 The following operators can be used in queries to compare values:
 
@@ -264,7 +417,7 @@ db.collection.find({ age: { $gt: 25 } });
 db.collection.find({ age: { $in: [25, 30, 35] } });
 ```
 
-## Logical
+### 8.2 Logical
 
 The following operators can logically compare multiple queries. 
 
@@ -287,7 +440,7 @@ db.collection.find({ $nor: [{ age: { $lt: 18 } }, { age: { $gt: 60 } }] });
 db.collection.find({ age: { $not: { $gt: 25 } } });
 ```
 
-## Evaluation
+### 8.3 Evaluation
 
 The following operators assist in evaluating documents.
 
@@ -308,7 +461,7 @@ db.collection.find({ $where: function() {
 } });
 ```
 
-## Fields
+### 8.4 Fields
 
 The following operators can be used to update fields:
 
@@ -318,7 +471,7 @@ The following operators can be used to update fields:
 - `$set`: Sets the value of a field
 - `$unset`: Removes the field from the document
 
-## Array
+### 8.5 Array
 
 The following operators assist with updating arrays.
 
@@ -329,21 +482,12 @@ The following operators assist with updating arrays.
 
 
 
-# ##################
-
-
-
-# Aggregation
+# 9. Aggregation
 
 - Aggregation Pipelines Can Have One or More "Stages/Operations" to process and transform data
 - The Order of These Stages Are Important because each stage processes the output of the previous stage
-- 
 
-
-
-
-
-## group
+### 9.1 group
 
 - The `$group` stage in MongoDB Aggregation is used to group documents by a specified key AND THEN to perform aggregations on the grouped data.
 - You can use various accumulator expressions like `$sum`, `$avg`, `$min`, `$max`, and `$push` within the `$group` stage to calculate aggregated values.
@@ -401,7 +545,7 @@ Result:
 
 
 
-## match
+### 9.2 match
 
 The `$match` stage in MongoDB aggregation is used to filter documents that pass through the pipeline based on specified conditions. It operates similarly to the `WHERE` clause in SQL, allowing you to include only those documents that meet certain criteria.
 
@@ -441,7 +585,7 @@ Aggregation Pipeline:
 
 
 
-## project
+### 9.3 project
 
 The `$project` stage in MongoDB aggregation is used to reshape documents by including, excluding, or adding fields. It allows you to control which fields are passed along to the next stage of the pipeline.
 
@@ -478,7 +622,7 @@ The `$project` stage in MongoDB aggregation is used to reshape documents by incl
 
 
 
-## sort
+### 9.4 sort
 
 The `$sort` stage in MongoDB aggregation is used to sort the documents in the pipeline based on specified fields
 
@@ -516,7 +660,7 @@ Aggregation Pipeline:
 
 
 
-## limit
+### 9.5 limit
 
 The `$limit` stage in MongoDB aggregation is used to limit the number of documents passed to the next stage in the pipeline. This is particularly useful for returning a subset of results, such as the top N documents based on some criteria.
 
@@ -549,23 +693,13 @@ The `$limit` stage in MongoDB aggregation is used to limit the number of documen
 
 
 
-# ##################
-
-
-
-# Index
+## 10. Index
 
 - An index in MongoDB is a data structure that improves the speed of data retrieval operations
 
 
 
-
-
-
-
-
-
-# Validation
+## 11. Validation
 
 - In MongoDB, a schema defines the structure and organization of data in a collection.
 - Unlike traditional SQL databases, MongoDB is schema-less, meaning it does not enforce a fixed schema at the database level.
