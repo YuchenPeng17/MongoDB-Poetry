@@ -159,28 +159,28 @@ Think of `pyproject.toml` as your shopping list for dependencies, where you spec
 
 ## 1. Get Started
 
-Install Homebrew
+1. Install Homebrew
 
 ```
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 brew --version
 ```
 
-Install MongoDB Shell (mongosh)
+2. Install MongoDB Shell (mongosh)
 
 ```bash
 brew install mongosh
 mongosh --version
 ```
 
-Option1: Connect to MongoDB (Terminal)
+3. Connecting Option1: Connect to MongoDB (Terminal)
 
 ```bash
 Database -> Connect -> Shell -> Copy Connection String to Terminal
 mongosh "mongodb+srv://mangoapp01.x6pabsg.mongodb.net/" --apiVersion 1 --username yucpeng17
 ```
 
-Option2: Connect to MongoDB (Python Code)
+4. Connecting Option2: Connect to MongoDB (Python Code)
 
 ```python
 # 1. Load the configuration file
@@ -199,9 +199,14 @@ client = MongoClient(uri)
 
 
 
-## 2. Creating a Database
+## 2. Creating Database
 
-- In MongoDB, a database is not actually created until it gets content.
+In MongoDB, a database is not actually created until it gets content.
+
+MongoDB will create it automatically when first writes to the database
+
+- Shell
+
 ```bash
 db
 - See which database you are using
@@ -214,8 +219,6 @@ use <dbName>
 ```
 
 - Python
-  - If `DB Name` does not exist, MongoDB will create it automatically when you first perform an operation that writes to the database
-  - Such as inserting a document into a collection within that database.
 
 ```python
 db = client['<DB Name>']
@@ -223,22 +226,23 @@ db = client['<DB Name>']
 
 
 
-## 3. Creating Collections 
+## 3. Creating Collections
 
-- In MongoDB, a collection is not actually created until it gets content.
-- Collection: Grouping of MongoDB Documents, like a Table in Relational DB
+In MongoDB, a collection is not actually created until it gets content.
+
+Collection: Grouping of MongoDB Documents, like a Table in Relational DB
 
 ### 3.1 Explicit Way
 
 ```javascript
 db.createCollection(<CollectionName>)
-e.g db.createCollection("people")
+e.g. db.createCollection("people")
 ```
 
 ### 3.2 Implicit Way
 ```javascript
 db.<CollectionName>.insertOne(<Object>)
-db.people.insertOne({"name": "Eve"})
+e.g. db.people.insertOne({"name": "Eve"})
 ```
 
 ### 3.3 Python
@@ -252,13 +256,16 @@ collection = db['<COLLECTION NAME>']
 
 ## 4. Inserting Documents
 
-- Document: An object or like an entry of a Table in Relational DB
+Document: An object or like an entry of a Table in Relational DB
 
 ### 4.1 Insert a Single Document
 ```javascript
 db.<Collectionname>.insertOne(<Object>)
+<Object> => {...}
+```
 
-e.g:
+```
+e.g.
 db.people.insertOne({
     name: "Lily",
     gender: "female",
@@ -268,10 +275,16 @@ db.people.insertOne({
 })
 ```
 
+
+
 ### 4.2 Insert Multiple Documents
+
 ```javascript
 db.<CollectionName>.insertMany(<ObjectLists>)
+<ObjectLists> => [{...}, {...}]
+```
 
+```
 e.g:
 db.people.insertMany([
     {
@@ -302,61 +315,137 @@ db.people.insertMany([
 
 ## 5. Finding Data
 
-### 5.1 Find Multiple Documents
-```javascript
-db.people.find(<{...}>)
-```
-- This method accepts a query object. If left empty, all documents will be returned.
+- **`find()`:** 查询当前Collection下所有文档
 
-### 5.2 Find One Document
-```javascript
-db.people.findOne(<{...}>)
 ```
-- This method accepts a query object. If left empty, it will return the first document it finds.
-
-### 5.3 Querying Data
-- To query or filter data, include a query in the `find()` or `findOne()` methods.
-```javascript
-db.people.find({gender: "female"})
+e.g. db.COLLECTION.find()
 ```
 
-### 5.4 Projection
-- A second parameter for both `find` methods.
-- This parameter is an object that describes which fields/keys to include in the results.
-  - `field/key: 1` indicates that the field should be included in the result.
-  - `field/key: 0` indicates that the field should be excluded from the result.
-  - Fields not specified in the projection are treated as excluded by default.
-```javascript
-db.people.find({}, { name: 1, gender: 1, _id: 0 });
+- **`find(<filterObject>)`:** 查询所有满⾜参数对象`<filterObject>`中指定过滤条件的数据
+
 ```
+查询Collection中所有等级是3的数据
+e.g. db.COLLECTION.find({ level : 3})
+```
+
+- **`db.find(<filterObject>, <selectObject>)`:** 查询所有满⾜参数对象`<filterObject>`中指定过滤条件的数 据，并且只返回`<selectObject>`中指定的字段。英文：`Projection`
+  - 1: Included / 0: Excluded
+  - If Not specified : Excluded, unless `_id` is included by default
+
+```
+查询Collection中名字是关羽的数据，并且返回数据中只包含name和level字段
+e.g. db.COLLECTION.find({name: "关羽"}, {name: 1, level: 1})
+```
+
+- **`findOne()`:**  与 find⽤法相同，找到满⾜过滤条件的对象，但是只返回第⼀条。
+
+```
+e.g. db.users.findOne({level: 1})
+```
+
+- **`countDocuments(<filterObject>)`:** 返回满⾜条件的记录的数量。
+
+```
+e.g. 
+db.users.countDocuments()
+db.users.countDocuments({ level: {$gt : 3}})
+```
+
+- **`limit()`:** 限制返回多少数据
+
+```
+db.people.find().limit(<NUMBER>)
+```
+
+- **`sort()`:** 使⽤给定的字段按照升序或者降序来排序。
+
+```
+// Example: Sorting in ascending order by age
+db.users.find().sort({ age: 1 });
+
+// Example: Sorting in descending order by name
+db.users.find().sort({ name: -1 });
+```
+
+- **`skip()`:** 从头开始跳过给定数值的⽂档。
+
+```
+// Example: Skip the first 5 documents
+db.users.find().skip(5);
+
+// Example: Skip the first 10 documents and limit the results to 5 documents
+db.users.find().skip(10).limit(5);
+```
+
+
 
 
 
 ## 6. Updating Data
 
-- `query`: 1st Partameter, Object to define which documents should be updated.
-- `update`: 2nd Parameter, Object defining the updated data.
-- `$set:`
+- **`updateOne()`:** 更新匹配过滤器的单个文档。
 
-### 6.1 Update One Document
+```
+db.collection.updateOne(filter, update, options)
+```
+
+`filter`：用于查找文档的查询条件。
+`update`：指定更新操作的文档或更新操作符。
+`options`：可选参数对象，如 upsert、arrayFilters 等。
+
+```
+e.g.:
+db.myCollection.updateOne(
+    { name: "Alice" },                // 过滤条件
+    { $set: { age: 26 } },            // 更新操作
+    { upsert: false }                 // 可选参数
+);
+```
+
+- **`updateMany()`:** 更新所有匹配过滤器的文档。
 
 ```javascript
-db.people.updateOne(query, $set: update)
+db.collection.updateMany(filter, update, options)
 ```
-### 6.2 Update Multiple Documents
-```javascript
-db.people.updateMany(query, $set: update)
-```
+`filter`：用于查找文档的查询条件。
+`update`：指定更新操作的文档或更新操作符。
+`options`：可选参数对象，如 upsert、arrayFilters 等。
+
 ```
 e.g:
-db.people.updateOne({name:"Bob"}, {$set: {height: "180cm"}})
+db.myCollection.updateMany(
+    { age: { $lt: 30 } },             // 过滤条件
+    { $set: { status: "active" } },   // 更新操作
+    { upsert: false }                  // 可选参数
+);
 ```
 
+- **`replaceOne()`:** 替换匹配过滤器的单个文档，新的文档将完全替换旧的文档。
 
+```
+db.collection.replaceOne(filter, replacement, options)
+```
 
-### 6.3 Insert if not found
+`filter`：用于查找文档的查询条件。
+`replacement`：新的文档，将替换旧的文档。
+`options`：可选参数对象，如 upsert 等。
 
-If you would like to insert the document if it is not found, you can use the `upsert` option.
+```
+db.myCollection.replaceOne(
+    { name: "Bob" },                  // 过滤条件
+    { name: "Bob", age: 31 }          // 新文档
+);
+```
+
+### 6.1 Operators in Upate
+
+**`$set`**: Sets the value of a field in a document. If the field does not exist, it is created.
+
+**`$unset, $inc, $mul`**
+
+### 6.2 Insert if not found
+
+Insert a new document if the specified filter does not match any existing documents
 
 ```
 db.people.updateOne( 
@@ -373,23 +462,35 @@ db.people.updateOne(
 )
 ```
 
+
+
 ## 7. Delete Documents
 
 We can delete documents by using the methods `deleteOne()` or `deleteMany()`.
 
 These methods accept a query object. The matching documents will be deleted.
 
-### 7.1 Delete One Document
+- **`deleteOne()`:** method will delete the first document that matches the query provided.
 
- `deleteOne()`: method will delete the first document that matches the query provided.
+```
+db.collection.deleteOne(filter, options)
+```
+
+`filter`：用于查找要删除的文档的查询条件。
+`options`：一个可选参数对象。
 
 ```
 db.people.deleteOne({ name: "Charlie" })
 ```
 
-### 7.2 Delete Many Documents
+- **`deleteMany()`:** method will delete all documents that match the query provided.
 
-`deleteMany()`: method will delete all documents that match the query provided.
+```
+db.collection.deleteMany(filter, options)
+```
+
+`filter`：用于查找要删除的文档的查询条件。
+`options`：一个可选参数对象。
 
 ```
 db.people.deleteMany({ gender: "male" })
@@ -397,29 +498,39 @@ db.people.deleteMany({ gender: "male" })
 
 
 
-## 8. Query Operators
+## 8. Operators
 
 ### 8.1 Comparison
 
-The following operators can be used in queries to compare values:
+Compare field values to specified values.
 
 - `$eq`: Values are equal
 - `$ne`: Values are not equal
 - `$gt`: Value is greater than another value
 - `$gte`: Value is greater than or equal to another value
 - `$lt`: Value is less than another value
-- `$lte`: Value is less than or equal to another value
-- `$in`: Value is matched within an array
+- `$lte`: less than or equal to another value
+- *`$in`: Value within an array
+- *`$nin`: Value not within an array
 
 ```
+- 如果不是比较的话：
+db.collection.find({ age: 25 });
+
+- 是比较的时候，就需要换成一个对象
 e.g:
 db.collection.find({ age: { $gt: 25 } });
 db.collection.find({ age: { $in: [25, 30, 35] } });
+db.collection.find({ age: { $gt: 25, $lt 50 } });
+
+- $in
+e.g.
+db.collection.find({level: {$in: [3,4,5]}})
 ```
 
 ### 8.2 Logical
 
-The following operators can logically compare multiple queries. 
+Combine multiple conditions.
 
 - `$and`: Returns documents where both queries match
 
@@ -428,6 +539,11 @@ db.collection.find({ $and: [{ age: { $gt: 25 } }, { age: { $lt: 40 } }] });
 ```
 
 - `$or`: Returns documents where either query matches
+
+```
+db.collection.fing({$or: [{level: { $gt: 4}}, {name: "GuanYu"}])
+```
+
 - `$nor`: Returns documents where both queries fail to match
 
 ```
@@ -440,9 +556,23 @@ db.collection.find({ $nor: [{ age: { $lt: 18 } }, { age: { $gt: 60 } }] });
 db.collection.find({ age: { $not: { $gt: 25 } } });
 ```
 
-### 8.3 Evaluation
+### 8.3 Element
 
-The following operators assist in evaluating documents.
+These operators are used to query fields based on their presence or type.
+
+- **`$exists`**: Matches documents that have the specified field.
+
+```
+db.employees.find({ "emp_age": { $exists: true, $gte: 30}})
+```
+
+- **`$type`**: Matches documents where the field is of the specified BSON type.
+
+```
+db.employees.find({ "emp_age": { $type: "double"}})
+```
+
+### 8.4 Evaluation
 
 - `$regex`: Allows the use of regular expressions when evaluating field values
   - ` regular expressions`: sequences of characters that form search patterns. !!Go Searching If Using!!
@@ -461,7 +591,16 @@ db.collection.find({ $where: function() {
 } });
 ```
 
-### 8.4 Fields
+- `$mod`
+
+```
+Example: Find documents where the remainder is 1000 when divided by 3000
+db.inventory.find({"quantity": {$mod: [3000, 1000]}})
+```
+
+
+
+### 8.5 Fields
 
 The following operators can be used to update fields:
 
