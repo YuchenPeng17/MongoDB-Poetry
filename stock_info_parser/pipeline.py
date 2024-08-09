@@ -25,8 +25,11 @@ class StockDataCollector:
         self.mongo_handler = MongoDBHandler(self.MONGODB_DATABASE, self.mongo_connection_string)
 
     def collect_nasdaq_data(self):
+        # 1. Definf URL
         nasdaq_url = "https://en.wikipedia.org/wiki/Nasdaq-100"
+        # 2. Pass the URL to web scrapping
         data = self.nasdaq_data_fetcher.fetch_data(nasdaq_url)
+        # 3. Parse the data fetched into csv, format based on the table in the website
         if data:
             columns = ['Company', 'Ticker', 'GICS Sector', 'GICS Sub-Industry']
             df = pd.DataFrame(data, columns=columns)
@@ -35,13 +38,22 @@ class StockDataCollector:
 
     def fetch_and_save_alpha_data(self):
         print("Fetching and saving AlphaVantage data...")
+        # Read from the nasdaq CSV we just got above
         nasdaq_data = pd.read_csv(self.nasdaq_company_list_file)
+        # Retrieve the tickers(股票代码) for all the companies in the CSV
         tickers = nasdaq_data['Ticker'].tolist()
         symbols = tickers
+        # Specify time frame
         start_date, end_date = '2021-01-01', '2023-12-31'
         
         print("Fetching company overview data...")
+        # For each ticker/symbol/company we have, fetch their company overview from Alpha Vantage API
         company_overviews = [self.alpha_vantage.fetch_company_overview(symbol) for symbol in symbols]
+        """
+        DataFrame: Converts JSON objects into a structured table format.
+        Columns: Represent the JSON keys.
+        Rows: Represent individual JSON objects, each containing data entries.
+        """
         pd.DataFrame(company_overviews).to_csv(self.COMPANY_OVERVIEW_FILE, index=False)
         print("Finished fetching company overview data.")
         

@@ -16,10 +16,13 @@ class AlphaVantageAPI:
         return requests.get(url).json()
     
     def filter_dataframe(self, df, symbol, start_date, end_date, date_col):
+        # 1. Create a new column for company symbol
         SYMBOL_COL = 'symbol'
         df[SYMBOL_COL] = symbol
+        # 2. Reorder the symbol column to the front
         cols = [SYMBOL_COL] + [col for col in df if col != SYMBOL_COL]
         df = df[cols]
+        # 3. Filters the DataFrame to include only those rows where the date in date_col is within the timeFrame.
         return df[(df[date_col] >= start_date) & (df[date_col] <= end_date)]
 
     def fetch_company_overview(self, symbol):
@@ -28,9 +31,14 @@ class AlphaVantageAPI:
     def fetch_time_series_weekly(self, symbol, start_date, end_date):
         data = self.fetch_data_from_url('TIME_SERIES_WEEKLY', symbol)
         print(data)
+        """
+        Creates a pandas DataFrame from the JSON data under the key 'Weekly Time Series',
+        then transposes it and reset the index's name to 'date'
+        """
         df = pd.DataFrame(data['Weekly Time Series']).T
         WEEKLY_SERIES_DATE_COL = 'date'
         df = df.reset_index().rename(columns={'index': WEEKLY_SERIES_DATE_COL})
+        # Filter the data based on the specified `start_date` and `end_date`
         return self.filter_dataframe(df, symbol, start_date, end_date, WEEKLY_SERIES_DATE_COL)
 
     def fetch_quarterly_earnings(self, symbol, start_date, end_date):
@@ -47,6 +55,7 @@ class AlphaVantageAPI:
         return self.fetch_data_from_url('NEWS_SENTIMENT', symbol)
 
     def save_to_csv(self, processor_func, symbols, output_file, start_date, end_date):
+        # Use specified function `processor_func` to process each symbol
         combined_df = pd.concat([processor_func(symbol, start_date, end_date) for symbol in symbols], ignore_index=True)
         combined_df.to_csv(output_file, index=False)
 
